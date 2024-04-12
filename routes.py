@@ -1,7 +1,7 @@
 # user_auth.py
 from flask import render_template, request, redirect, url_for, flash, session
 from main import app
-from models import db, User, Section, Book, Cart, Payment, Transaction, Order
+from models import db, User, Section, Book, Issue, Return, Cart, Payment, Transaction, Order
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from functools import wraps
@@ -176,9 +176,12 @@ def admin_login_post():
 @admin_required
 def admin_dash():
     sections = Section.query.all()
+    for section in sections:
+       print(section.books)
     section_names = [section.name for section in sections]
     section_sizes = [len(section.books) for section in sections]
     return render_template('librarian/librarian_dash.html', sections=sections, section_names=section_names, section_sizes=section_sizes)
+    
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() == 'pdf'
@@ -227,6 +230,15 @@ def add_section_post():
     flash('Section added successfully')
     return redirect(url_for('admin_dash'))
 
+@app.route('/category/<int:id>/')
+@admin_required
+def show_section(id):
+    section = Section.query.get(id)
+    if not section:
+        flash('Sectiondoes not exist')
+        return redirect(url_for('admin_dash'))
+    return render_template('section/show.html', section=section)
+
 
 @app.route('/section/<int:id>/edit')
 @admin_required
@@ -240,20 +252,30 @@ def edit_section(id):
 @app.route('/section/<int:id>/edit', methods=['POST'])
 @admin_required
 def edit_section_post(id):
-    section=Section.query.get(id)
+    section = Section.query.get(id)
     if not section:
         flash('Section does not exist')
         return redirect(url_for('admin_dash'))
+
     name = request.form.get('name')
-    date_created = request.form.get('date_created')
+    date_created_str = request.form.get('date_created')
     description = request.form.get('description')
-    if not name or not date_created or not description:
+
+    if not name or not date_created_str or not description:
         flash('Please fill all the fields')
         return redirect(url_for('edit_section', id=id))
-    section.name=name
-    section.date_created=date_created
-    section.description=description
+
+    try:
+        date_created = datetime.strptime(date_created_str, '%Y-%m-%d').date()
+    except ValueError:
+        flash('Invalid date format')
+        return redirect(url_for('edit_section', id=id))
+
+    section.name = name
+    section.date_created = date_created
+    section.description = description
     db.session.commit()
+
     flash('Section updated successfully')
     return redirect(url_for('admin_dash'))
 
@@ -278,4 +300,119 @@ def delete_section_post(id):
 
     flash('Section deleted successfully')
     return redirect(url_for('admin_dash'))
+
+@app.route('/book/add/<int:section_id>')
+@admin_required
+def add_book(section_id):
+    sections = Section.query.all()
+    section = Section.query.get(section_id)
+    if not section:
+        flash('Section does not exist')
+        return redirect(url_for('librarian_dash'))
+    now = datetime.now().strftime('%Y-%m-%d')
+    return render_template('books/add.html', section=section, sections=sections, now=now)
+
+@app.route('/book/add/', methods=['POST'])
+@admin_required
+def add_book_post():
+    name = request.form.get('name')
+    content = request.form.get('content')
+    author = request.form.get('author')
+    price = request.form.get('price')
+    section_id = request.form.get('section_id')
+    
+    section = Section.query.get(section_id)
+    if not section:
+        flash('Section does not exist')
+        return redirect(url_for('admin_dash'))
+
+    if not name or not content or not author or not price:
+        flash('Please fill out all fields')
+        return redirect(url_for('add_book', section_id=section_id))
+    try:
+        price = float(price)
+        
+    except ValueError:
+        flash('Invalid price')
+        return redirect(url_for('add_book', section_id=section_id))
+
+    if price <= 0:
+        flash('Invalid price')
+        return redirect(url_for('add_book', section_id=section_id))
+    
+    book = Book(name=name, content=content, author=author, price=price, section=section)
+    db.session.add(book)
+    db.session.commit()
+
+    flash('Product added successfully')
+    return redirect(url_for('show_section', id=section_id))
+
+@app.route('/book/<int:id>/edit')
+def edit_book(id):
+    sections = Section.query.all()
+    book = book.query.get(id)
+    return render_template('book/edit.html', sections=sections, book = book)
+
+@app.route('/book/<int:id>/edit', methods=['POST'])
+def edit_book_post(id):
+    name = request.form.get('name')
+    content = request.form.get('content')
+    author = request.form.get('author')
+    price = request.form.get('price')
+    section_id = request.form.get('section_id')
+
+    section = Section.query.get(section_id)
+    if not section:
+        flash('Section does not exist')
+        return redirect(url_for('admin_dash'))
+
+    if not name or not content or not author or not price:
+        flash('Please fill out all fields')
+        return redirect(url_for('add_book', section_id=section_id))
+    try:
+        price = float(price)
+        
+    except ValueError:
+        flash('Invalid price')
+        return redirect(url_for('add_book', section_id=section_id))
+
+    if price <= 0:
+        flash('Invalid price')
+        return redirect(url_for('add_book', section_id=section_id))
+    
+    book = Book.query.get(id)
+    book.name = name
+    book.price = content
+    book.author = author
+    book.price = price
+    book.section_id = section_id
+    db.session.commit()
+
+    flash('Book edited successfully')
+    return redirect(url_for('show_section', id=section_id))
+
+
+@app.route('/book/<int:id>/delete')
+def delete_book(id):
+    book = Book.query.get(id)
+    if not book:
+        flash('Book does not exist')
+        return redirect(url_for('admin_dash'))
+    return render_template('book/delete.html', book=book)
+
+@app.route('/book/<int:id>/delete', methods=['POST'])
+@admin_required
+def delete_book_post(id):
+    book = Book.query.get(id)
+    if not book:
+        flash('Book does not exist')
+        return redirect(url_for('admin_dash'))
+    section_id = book.section.id
+    db.session.delete(book)
+    db.session.commit()
+
+    flash('Book deleted successfully')
+    return redirect(url_for('show_book', id=section_id))
+
+
 

@@ -35,11 +35,11 @@
     <tbody>
         {% for book in section.books %}
         <tr>
-            <td>{{books.id}}</td>
-            <td>{{books.name}}</td>
-            <td>{{books.desc}}</td>
-            <td>{{books.price}}</td>
-            <td>{{books.quantity}}</td>
+            <td>{{book.id}}</td>
+            <td>{{book.name}}</td>
+            <td>{{book.desc}}</td>
+            <td>{{book.price}}</td>
+            <td>{{book.quantity}}</td>
             <td>
                 <a href="{{url_for('edit_section', id=section.id)}}" class="btn btn-primary">
                     <i class="fas fa-edit    "></i>

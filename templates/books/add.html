@@ -17,18 +17,12 @@
             required>
         </div>
         <div class="form-group">
-            <label for="desc" class="form-label">Description:</label>
-            <input type="text" name="desc" id="desc" class="form-control" required>
+            <label for="content" class="form-label">Content:</label>
+            <input type="text" name="content" id="content" class="form-control" required>
         </div>
         <div class="form-group">
-            <label for="price" class="form-label">Price:<i class="fas fa-rupee-sign    "></i></label>
-            <input type="number" 
-            name="price" 
-            id="price" 
-            min="1"
-            value=""
-            class="form-control" 
-            required>
+            <label for="author" class="form-label">Author:</label>
+            <input type="text" name="author" id="author" class="form-control" required>
         </div>
         <div class="form-group">
             <label for="section_id" class="form-label">Section:</label>
@@ -42,18 +36,16 @@
                 {% endfor %}
             </select>
         </div>
-
         <div class="form-group">
-            <label for="quantity" class="form-label">Quantity:</label>
+            <label for="price" class="form-label">Price:<i class="fas fa-rupee-sign    "></i></label>
             <input type="number" 
-            name="quantity" 
-            id="quantity" 
+            name="price" 
+            id="price" 
             min="1"
             value=""
             class="form-control" 
             required>
         </div>
-        
         <button type="submit" class="btn btn-success">
             <i class="fas fa-plus    "></i>
             Add
