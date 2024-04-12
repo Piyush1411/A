@@ -1,0 +1,62 @@
+<!-- templates/user/user.html -->
+{% extends "base.html" %}
+
+{% block title %}User Login{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="row">
+            <!-- Login Section -->
+            <div class="col-md-6 text-white">
+                <h2>User Login</h2>
+                <form action="{{ url_for('login') }}" method="POST">
+                    <!-- Add your login form fields (e.g., username and password) here -->
+                    <div class="form-group">
+                        <label for="userName">Username:</label>
+                        <input type="text" id="userName" name="userName" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" name="password" class="form-control" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+            </div>
+
+            <!-- Vertical Divider -->
+            <div class="col-md-1 border-right"></div>
+
+            <!-- Signup Section -->
+            <div class="col-md-5 text-white">
+                <h2>Register</h2>
+                <form action="{{ url_for('register') }}" method="POST">
+                    <!-- Add your signup form fields here -->
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="userName">Username:</label>
+                        <input type="text" id="userName" name="userName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="fullName">Full Name:</label>
+                        <input type="text" id="fullName" name="fullName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password1">Password:</label>
+                        <input type="password" id="password1" name="password1" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password2">Confirm Password:</label>
+                        <input type="password" id="password2" name="password2" class="form-control" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-success">Register</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

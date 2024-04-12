@@ -1,0 +1,60 @@
+<!--index.html-->
+{% extends 'base.html' %}
+
+{% block title %}
+    Books of Section {{section.name}}
+{% endblock %}
+
+{% block content %}
+<div class="col-md-6 text-white">
+    <h2 class="display-1">Section {{section.name}}</h2>
+    <div class="heading">
+        <h3 >Books</h3>
+        </div>
+        </div>
+        <a href="{{url_for('add_book', section_id=section.id)}}" class="btn btn-success">
+            <i class="fas fa-plus    "></i>
+    Add
+</a>
+<!--Uploading book file-->
+<!--<form action="{{url_for('upload_file', method=['post'])}}" method="POST" enctype="multipart/form-data">
+    <input type="file" name="file" id="file">
+    <button type="submit">Upload</button>
+</form>-->
+<table class="table">
+    <thead>
+        <tr>
+            <th>Book ID</th>
+            <th>Book Name</th>
+            <th>Book Description</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for book in section.books %}
+        <tr>
+            <td>{{books.id}}</td>
+            <td>{{books.name}}</td>
+            <td>{{books.desc}}</td>
+            <td>{{books.price}}</td>
+            <td>{{books.quantity}}</td>
+            <td>
+                <a href="{{url_for('edit_section', id=section.id)}}" class="btn btn-primary">
+                    <i class="fas fa-edit    "></i>
+                    Edit
+               </a>
+               <a href="{{url_for('delete_section', id=section.id)}}" class="btn btn-danger">
+                <i class="fas fa-trash "></i>
+                Delete
+               </a>
+            </td>
+        </tr>
+            
+        {% endfor %}
+    </tbody>
+</table>
+
+
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Add Section
+{% endblock %}
+
+{% block content %}
+<div class="col-md-6 text-white">
+    <h1 class="display-1">Add Section</h1>
+    <form action="" method="post" class="form">
+        <div class="form-group">
+            <label for="name" class="form-label">Section Name:</label>
+            <input type="text"
+            name="name"
+            id="name"
+            class="form-control"
+            required>
+        </div>
+        <div class="form-group">
+            <label for="date_created" class="form-label">Date Created:</label>
+            <input type="date" name="date_created" id="date_created" required
+                   value="{{ current_date }}" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="name" class="form-label">Description:</label>
+            <input type="text"
+            name="description"
+            id="description"
+            class="form-control"
+            required>
+        </div>
+    </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-success">
+                <i class="fas fa-plus    "></i>
+                Add
+            </button>
+        </div>
+    </form>
+{% endblock %}

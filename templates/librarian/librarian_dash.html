@@ -1,0 +1,55 @@
+<!--index.html-->
+{% extends 'base.html' %}
+
+{% block title %}
+    Librarian Dashboard
+{% endblock %}
+
+{% block content %}
+<div class="col-md-6 text-white">
+<h1 class="display-1">Librarian Dashboard</h1>
+<a href="{{url_for('add_section')}}" class="btn btn-success">
+    <i class="fas fa-plus    "></i>
+    Add
+</a>
+
+<h2 class="display-2">Section:</h2>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Section ID</th>
+            <th>Section Name</th>
+            <th>No of Books</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for section in sections %}
+        <tr>
+            <td>{{section.id}}</td>
+            <td>{{section.name}}</td>
+            <td>{{section.books|length}}</td>
+            <td>
+                <a href="{{url_for('show_section', id=section.id)}}" class="btn btn-primary">
+                    <i class="fas fa-search    "></i>
+                    Show
+               </a>
+                <a href="{{url_for('edit_section', id=section.id)}}" class="btn btn-primary">
+                    <i class="fas fa-edit    "></i>
+                    Edit
+               </a>
+               <a href="{{url_for('delete_section', id=section.id)}}" class="btn btn-danger">
+                <i class="fas fa-trash "></i>
+                Delete
+               </a>
+            </td>
+        </tr>
+            
+        {% endfor %}
+    </tbody>
+</table>
+
+
+{% endblock %}
