@@ -39,7 +39,7 @@ def login_post():
     
     session['user_id'] = user.id
     flash('Login successful')
-    return redirect(url_for('profile'))
+    return redirect(url_for('user_dash'))
 
 @app.route('/register')
 def register():
@@ -413,6 +413,50 @@ def delete_book_post(id):
 
     flash('Book deleted successfully')
     return redirect(url_for('show_book', id=section_id))
+
+# --- user pages
+
+@app.route('/user_dash')
+@auth_required
+def user_dash():
+    user = User.query.get(session['user_id'])
+    if user.is_admin:
+        return redirect(url_for('admin_dash'))
+    
+    sections = Section.query.all()
+
+    sname = request.args.get('sname') or ''
+    bname = request.args.get('bname') or ''
+    price = request.args.get('price')
+    
+    if price:
+        try:
+            price = float(price)
+        except ValueError:
+            flash('Invalid Price')
+            return redirect(url_for('user_dash'))
+        if price <= 0:
+            flash('Invalid Price')
+            return redirect(url_for('user_dash'))
+    
+    #parameter = request.args.get('parameter')
+    #query = request.args.get('query')
+    
+    ##parameters = {'cname': 'Category Name','pname': 'Product Name','price': 'Max Price'}
+
+    ##if parameter == 'cname':
+        #categories = Category.query.filter(Category.name.ilike(f'%{query}%')).all()
+        #return render_template('user_dash.html', categories=categories, query=query, parameters=parameters)
+    ##elif parameter == 'pname':
+        #return render_template('user_dash.html', categories=categories, param=parameter, pname=query, parameters=parameters, query=query)
+    ##elif parameter == 'price':
+        #query = float(query)
+        #return render_template('user_dash.html', categories=categories, param=parameter, price=query, parameters=parameters, query=query)
+    
+    if sname:
+        sectionss = Section.query.filter(Section.name.ilike(f'%{sname}%')).all()
+    
+    return render_template('user/user_dash.html', sections=sections, sname=sname, bname=bname,price=price)#, parameters=parameters)
 
 
 

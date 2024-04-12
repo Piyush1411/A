@@ -1,5 +1,5 @@
 
-{% extends 'layout.html' %}
+{% extends 'base.html' %}
 
 {% block content %}
 {% include 'searchbar.html' with context %}
@@ -14,7 +14,7 @@
         {% if bname != '' and bname.lower() in book.name.lower() or not bname %}
         {% if price and book.price <= price or not price %} 
             <div class="card" style="width: 18rem;">
-            <img src="https://picsum.photos/200/200" class="card-img-top" alt="{{product.name}}">
+            <img src="https://picsum.photos/200/200" class="card-img-top" alt="{{book.name}}">
             <div class="card-body">
                 <h5 class="card-title">{{book.name}}</h5>
                 <p class="card-text">
@@ -24,14 +24,14 @@
                 </div>
                 <div class="quantity">
                     <strong>Downloadable:</strong>
-                    {{product.quantity}}
+                    
                 </div>
                 </p>
-                {% if book.quantity > 0 %}
+
                     
                 
                 <div class="quantity_input">
-                    <form action="{{url_for('add_to_cart', book_id=book.id)}}" method="POST" class="form">
+                    <form action="" method="POST" class="form">
                         <label for="quantity">Quantity:</label>
                         <input class="form" type="number" name="quantity" id="quantity" min="1"
                             max="{{book.quantity}}" value="1">
@@ -43,7 +43,7 @@
                     <i class="fas fa-times    "></i>
                     Not Downloadable
                 </button>
-                {% endif %}
+                
             </div>
     </div>
     <!--{% endif %}-->
