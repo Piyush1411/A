@@ -556,7 +556,9 @@ def payments_post(id):
         return redirect(url_for('cart'))
 
     flash('Payment successful')
+    print('Before redirection to user_dash')
     return redirect(url_for('user_dash'))
+    print('After redirection to user_dash')
 
 @app.route('/orders')
 @auth_required
