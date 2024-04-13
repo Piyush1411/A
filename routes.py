@@ -527,17 +527,14 @@ def checkout():
         db.session.delete(cart)
     db.session.add(transaction)
     db.session.commit()
+    transaction = Transaction.query.filter_by(user_id=session['user_id']).all()[0]
+    flash('Order placed successfully')
+    return redirect(url_for('payments', id=transaction.id))
 
-    flash('Welcome to Payment site')
-    return redirect(url_for('payments'))
-
-@app.route('/payments')
+@app.route('/payments/<int:id>')
 @auth_required
-def payments():
-    transaction = Transaction(user_id=session['user_id'], datetime=datetime.now())
-    if not transaction:
-        flash('Transaction not found')
-        return redirect(url_for('cart'))
+def payments(id):
+    transaction = Transaction.query.filter_by(user_id=session['user_id'], id =id).first()
     total = sum([order.price * order.quantity for order in transaction.orders])
     GST = total * 0.18
     amount_payable = total + GST
@@ -559,10 +556,10 @@ def payments_post(id):
         return redirect(url_for('cart'))
 
     flash('Payment successful')
-    return redirect(url_for('orders'))
+    return redirect(url_for('user_dash'))
 
 @app.route('/orders')
 @auth_required
-def orders(payment_id):
+def orders():
     transactions = Transaction.query.filter_by(user_id=session['user_id']).order_by(Transaction.datetime.desc()).all()
     return render_template('user/orders.html', transactions=transactions)
