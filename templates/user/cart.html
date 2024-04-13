@@ -39,7 +39,7 @@
             <td colspan="3"><strong>Total</strong></td>
             <td>{{total}}</td>
             <td>
-                <form action="{{url_for('checkout')" method="post">
+                <form action="{{url_for('checkout', transaction_id=transaction_id)}}" method="post">
                     <button class="btn btn-success">
                         <i class="fas fa-shopping-cart"></i>
                         Checkout
