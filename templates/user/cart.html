@@ -1,4 +1,4 @@
-{% extends 'layout.html' %}
+{% extends 'base.html' %}
 
 {% block content %}
 <h1 class="display-1">Cart</h1>
@@ -39,7 +39,7 @@
             <td colspan="3"><strong>Total</strong></td>
             <td>{{total}}</td>
             <td>
-                <form action="{{url_for('checkout')}}" method="post">
+                <form action="{{url_for('checkout')" method="post">
                     <button class="btn btn-success">
                         <i class="fas fa-shopping-cart"></i>
                         Checkout

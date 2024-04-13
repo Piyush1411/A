@@ -31,7 +31,7 @@
                     
                 
                 <div class="quantity_input">
-                    <form action="" method="POST" class="form">
+                    <form action="{{url_for('add_to_cart', book_id=book.id)}}" method="POST" class="form">
                         <label for="quantity">Quantity:</label>
                         <input class="form" type="number" name="quantity" id="quantity" min="1"
                             max="{{book.quantity}}" value="1">

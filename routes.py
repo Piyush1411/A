@@ -458,5 +458,90 @@ def user_dash():
     
     return render_template('user/user_dash.html', sections=sections, sname=sname, bname=bname,price=price)#, parameters=parameters)
 
+@app.route('/add_to_cart/<int:book_id>', methods = ['POST'])
+@auth_required
+def add_to_cart(book_id):
+    book = Book.query.get(book_id)
+    if not book:
+        flash('Book does not exist')
+        return redirect(url_for('user_dash'))
+    quantity = request.form.get('quantity')
+    try:
+        quantity = int(quantity)
+    except ValueError:
+        flash('Invalid quantity')
+        return redirect(url_for('user_dash'))
+    if quantity <= 0 or quantity > 5:
+        flash(f'Invalid quantity, should be between 1 and 6')
+        return redirect(url_for('user_dash'))
+    
+    cart = Cart.query.filter_by(user_id=session['user_id'], book_id=book_id).first()
+
+    if cart:
+        if quantity + cart.quantity > 5:
+            flash(f'Invalid quantity, should be between 1 and 6')
+            return redirect(url_for('user_dash'))
+        cart.quantity += quantity
+    else:
+        cart = Cart(user_id=session['user_id'], book_id=book_id, quantity=quantity)
+        db.session.add(cart)
+    
+    db.session.commit()
+
+    flash('Product added to cart succesfully')
+    return redirect(url_for('user_dash'))
+
+@app.route('/cart')
+@auth_required
+def cart():
+    carts = Cart.query.filter_by(user_id=session['user_id']).all()
+    total = sum([cart.book.price * cart.quantity for cart in carts])
+    return render_template('user/cart.html', carts=carts, total=total)
+
+@app.route('/cart/<int:id>/delete', methods=['POST'])
+@auth_required
+def delete_cart(id):
+    cart = Cart.query.get(id)
+    if not cart:
+        flash('Cart does not exist')
+        return redirect(url_for('cart'))
+    if cart.user_id != session['user_id']:
+        flash('You are not authorized to access this page')
+        return redirect(url_for('cart'))
+    db.session.delete(cart)
+    db.session.commit()
+    flash('Cart deleted successfully')
+    return redirect(url_for('cart'))
+
+@app.route('/checkout', methods=['POST'])
+@auth_required
+def checkout():
+    carts = Cart.query.filter_by(user_id=session['user_id']).all()
+    if not carts:
+        flash('Cart is empty')
+        return redirect(url_for('cart'))
+
+    transaction = Transaction(user_id=session['user_id'], datetime=datetime.now())
+    payment = Payment.query.filter_by(user_id=session['user_id'], datetime=datetime.now()).first()
+    for cart in carts:
+        order = Order(transaction=transaction, book=cart.book, payment=payment, quantity=cart.quantity, price=cart.book.price)
+        db.session.add(order)
+        db.session.delete(cart)
+    db.session.add(transaction)
+    db.session.add(payment)
+    db.session.commit()
+
+    flash('Order placed successfully')
+    return redirect(url_for('payments', id =transaction.id))
+
+@app.route('/payments/<int:id>')
+@auth_required
+def payments(id):
+    transactions = Transaction.query.filter_by(user_id=session['user_id'])
+    carts = Cart.query.filter_by(user_id=session['user_id']).all()
+    total = sum([cart.book.price * cart.quantity for cart in carts])
+    GST = total * 0.18
+    amount_payable = total + GST
+    return render_template('payments.html', transactions=transactions, amount_payable=amount_payable)
 
 
