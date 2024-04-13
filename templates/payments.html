@@ -3,8 +3,8 @@
 {% block content %}
 <div class="col-md-6 text-white">
     <h1 class="display-1">Payments</h1>
-    <h1>{{transaction.id}}</h1>
-    <form action="" method="POST">
+    <h1>{{transaction_id}}</h1>
+    <form action="{{(url_for('payments'))}}" method="POST">
         <div class="form-group">
             <label for="payment_method">Select Payment Method:</label>
             <div class="form-check">
@@ -28,7 +28,6 @@
                 <label class="form-check-label" for="wallet">Wallet</label>
             </div>
         </div>
-    </div>
         <table class="table">
             <thead>
                 <tr>
@@ -51,13 +50,14 @@
             </tbody>
         </table>
         <table>
-            <form action="" method="post">
+            <form action="{{(url_for('payments_post', id=payment.id))}}" method="post">
                 <button class="btn btn-success">
                      Proceed to Payment
                 </button>
             </form>
         </table>
-    </form>
+  </form>  
+</div>
 {% endblock %}
 
 {% block style %}

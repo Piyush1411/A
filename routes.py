@@ -350,8 +350,8 @@ def add_book_post():
 @app.route('/book/<int:id>/edit')
 def edit_book(id):
     sections = Section.query.all()
-    book = book.query.get(id)
-    return render_template('book/edit.html', sections=sections, book = book)
+    book = Book.query.get(id)
+    return render_template('books/edit.html', sections=sections, book = book)
 
 @app.route('/book/<int:id>/edit', methods=['POST'])
 def edit_book_post(id):
@@ -397,7 +397,7 @@ def delete_book(id):
     if not book:
         flash('Book does not exist')
         return redirect(url_for('admin_dash'))
-    return render_template('book/delete.html', book=book)
+    return render_template('books/delete.html', book=book)
 
 @app.route('/book/<int:id>/delete', methods=['POST'])
 @admin_required
@@ -411,7 +411,7 @@ def delete_book_post(id):
     db.session.commit()
 
     flash('Book deleted successfully')
-    return redirect(url_for('show_book', id=section_id))
+    return redirect(url_for('show_section', id=section_id))
 
 # --- user pages
 
@@ -528,41 +528,41 @@ def checkout():
     db.session.add(transaction)
     db.session.commit()
 
-    flash('Order placed successfully')
-    return redirect(url_for('payments', transaction_id=transaction.id))
+    flash('Welcome to Payment site')
+    return redirect(url_for('payments'))
 
-@app.route('/payments/<int:transaction_id>')
+@app.route('/payments')
 @auth_required
-def payments(transaction_id):
+def payments():
     transaction = Transaction(user_id=session['user_id'], datetime=datetime.now())
     if not transaction:
         flash('Transaction not found')
         return redirect(url_for('cart'))
-
-    payment = Payment(user_id=session['user_id'], transaction_id=transaction_id, status='success', datetime=datetime.now())
+    total = sum([order.price * order.quantity for order in transaction.orders])
+    GST = total * 0.18
+    amount_payable = total + GST
+    payment = Payment(user_id=session['user_id'], transaction=transaction, amount_payable=amount_payable, status='success', datetime=datetime.now())
+    db.session.add(payment)
+    db.session.commit()
     if not payment:
         flash('Payment not found')
         return redirect(url_for('cart'))
 
-    total = sum([order.price * order.quantity for order in transaction.orders])
-    GST = total * 0.18
-    amount_payable = total + GST
+    return render_template('payments.html', payment=payment, total=total, GST=GST, amount_payable=amount_payable)
 
-    return render_template('payments.html', transaction=transaction, payment=payment, total=total, GST=GST, amount_payable=amount_payable)
-
-@app.route('/payments/<int:transaction_id>', methods=['POST'])
+@app.route('/payments/<int:id>', methods=['POST'])
 @auth_required
-def payments_post(transaction_id):
-    payment = Payment.query.get(transaction_id)
+def payments_post(id):
+    payment = Payment.query.get(id)
     if not payment:
         flash('Payment not found')
         return redirect(url_for('cart'))
 
     flash('Payment successful')
-    return redirect(url_for('orders'), payment=payment)
+    return redirect(url_for('orders'))
 
 @app.route('/orders')
 @auth_required
-def orders():
+def orders(payment_id):
     transactions = Transaction.query.filter_by(user_id=session['user_id']).order_by(Transaction.datetime.desc()).all()
-    return render_template('orders.html', transactions=transactions)
+    return render_template('user/orders.html', transactions=transactions)

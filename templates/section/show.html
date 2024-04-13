@@ -29,7 +29,6 @@
             <th>Book Content</th>
             <th>Author</th>
             <th>Price</th>
-            <th>Quantity</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -41,13 +40,12 @@
             <td>{{book.content}}</td>
             <td>{{book.author}}</td>
             <td>{{book.price}}</td>
-            <td>{{book.quantity}}</td>
             <td>
-                <a href="{{url_for('edit_section', id=section.id)}}" class="btn btn-primary">
+                <a href="{{url_for('edit_book', id=book.id)}}" class="btn btn-primary">
                     <i class="fas fa-edit    "></i>
                     Edit
                </a>
-               <a href="{{url_for('delete_section', id=section.id)}}" class="btn btn-danger">
+               <a href="{{url_for('delete_book', id=book.id)}}" class="btn btn-danger">
                 <i class="fas fa-trash "></i>
                 Delete
                </a>
