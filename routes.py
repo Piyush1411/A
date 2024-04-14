@@ -563,12 +563,12 @@ def access_book(issue_id):
     if issue and issue.user_id == session['user_id']:
         return_date = issue.issue_date + timedelta(days=7)
         if user.is_admin:
-            if datetime.now() >= issue.issue_date and datetime.now() <= return_date:
-                issue.access = True
+            if datetime.now() == issue.issue_date and datetime.now() <= return_date:
+                issue.access = "Grant access to user"
             else:
-                issue.access = False
+                issue.access = "Revoke access from user"
         else:
-            if datetime.now() >= issue.issue_date and datetime.now() <= return_date:
+            if datetime.now() == issue.issue_date and datetime.now() <= return_date:
                 issue.access = True
             else:
                 issue.access = False
