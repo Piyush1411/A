@@ -535,7 +535,7 @@ def checkout():
     if order_detail:
         issue_date=datetime.now()
         return_date = issue_date + timedelta(days=7)
-        if datetime.now() == issue_date and datetime.now() <= return_date:
+        if datetime.now() >= issue_date and datetime.now() <= return_date:
                 access = True
         else:
                 access = False
