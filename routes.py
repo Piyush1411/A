@@ -535,10 +535,15 @@ def checkout():
     if order_detail:
         issue_date=datetime.now()
         return_date = issue_date + timedelta(days=7)
+        if datetime.now() == issue_date and datetime.now() <= return_date:
+                access = True
+        else:
+                access = False
         issue = Issue(user_id=session['user_id'], 
                       order_id=order_detail.id,
                       issue=issue_date,
-                      return_date=return_date)
+                      return_date=return_date,
+                      access=access)
         db.session.add(issue)
         db.session.commit()
     else:
@@ -547,38 +552,6 @@ def checkout():
     transaction = Transaction.query.filter_by(user_id=session['user_id']).all()[0]
     flash('Order placed successfully')
     return redirect(url_for('payments', id=transaction.id))
-
-@app.route('/issue')
-@auth_required
-def issue():
-    issue_id = request.args.get('id')
-    issue = Issue.query.get(issue_id)
-    return render_template('user/user_dash.html', issue=issue)
-
-@app.route('/issue/access_book/<int:issue_id>', methods=['POST'])
-@auth_required
-def access_book(issue_id):
-    user = User.query.get(session['user_id'])
-    issue = Issue.query.get(issue_id)
-    if issue and issue.user_id == session['user_id']:
-        return_date = issue.issue_date + timedelta(days=7)
-        if user.is_admin:
-            if datetime.now() == issue.issue_date and datetime.now() <= return_date:
-                issue.access = "Grant access to user"
-            else:
-                issue.access = "Revoke access from user"
-        else:
-            if datetime.now() == issue.issue_date and datetime.now() <= return_date:
-                issue.access = True
-            else:
-                issue.access = False
-
-        db.session.commit()
-
-        return render_template('user/user_dash.html', issue =issue)
-    else:
-        flash('Invalid issue ID or unauthorized access.')
-        return redirect(url_for('user_dash'))
 
 @app.route('/payments/<int:id>')
 @auth_required
