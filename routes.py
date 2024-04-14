@@ -575,7 +575,7 @@ def access_book(issue_id):
 
         db.session.commit()
 
-        return render_template('user/user_dash.html', issue =issue,)
+        return render_template('user/user_dash.html', issue =issue)
     else:
         flash('Invalid issue ID or unauthorized access.')
         return redirect(url_for('user_dash'))
