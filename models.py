@@ -36,18 +36,12 @@ class Book(db.Model):
     #uploads = db.relationship('Upload', backref='book', lazy=True, cascade='all, delete-orphan')
     carts = db.relationship('Cart', backref='book', lazy=True, cascade='all, delete-orphan')
     orders = db.relationship('Order', backref='book', lazy=True, cascade='all, delete-orphan')
-    issue_date = db.relationship('Issue', backref='book', lazy=True, cascade='all, delete-orphan')
-
+    
 class Issue(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    book_id = db.Column(db.Integer, db.ForeignKey('book.id'), nullable=False)
     order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=False)
     issue = db.Column(db.Date, nullable=False)
-    return__date = db.relationship('Return', backref='issue', lazy=True, cascade='all, delete-orphan')
-class Return(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    issue_id = db.Column(db.Integer, db.ForeignKey('issue.id'), nullable=False)
     return_date = db.Column(db.Date, nullable=False)
     
 class Cart(db.Model):

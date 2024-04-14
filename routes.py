@@ -1,11 +1,12 @@
 # user_auth.py
 from flask import render_template, request, redirect, url_for, flash, session
 from main import app
-from models import db, User, Section, Book, Issue, Return, Cart, Payment, Transaction, Order
+from models import db, User, Section, Book, Issue, Cart, Payment, Transaction, Order
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from functools import wraps
 from datetime import datetime, timedelta
+from flask_login import current_user 
 import csv
 import os
 from uuid import uuid4
@@ -453,9 +454,12 @@ def user_dash():
         #return render_template('user_dash.html', categories=categories, param=parameter, price=query, parameters=parameters, query=query)
     
     if sname:
-        sectionss = Section.query.filter(Section.name.ilike(f'%{sname}%')).all()
+        sections = Section.query.filter(Section.name.ilike(f'%{sname}%')).all()
+    issues = [] 
+    if not user.is_admin:
+        issues = Issue.query.filter_by(user_id=session['user_id']).all()
     
-    return render_template('user/user_dash.html', sections=sections, sname=sname, bname=bname,price=price)#, parameters=parameters)
+    return render_template('user/user_dash.html', sections=sections, sname=sname, bname=bname,price=price, issues=issues)#, parameters=parameters)
 
 @app.route('/add_to_cart/<int:book_id>', methods = ['POST'])
 @auth_required
@@ -527,6 +531,19 @@ def checkout():
         db.session.delete(cart)
     db.session.add(transaction)
     db.session.commit()
+    order_detail = Order(id=order.id)
+    if order_detail:
+        issue_date=datetime.now()
+        return_date = issue_date + timedelta(days=7)
+        issue = Issue(user_id=session['user_id'], 
+                      order_id=order_detail.id,
+                      issue=issue_date,
+                      return_date=return_date)
+        db.session.add(issue)
+        db.session.commit()
+    else:
+        flash('Issue date cannot be created.')
+
     transaction = Transaction.query.filter_by(user_id=session['user_id']).all()[0]
     flash('Order placed successfully')
     return redirect(url_for('payments', id=transaction.id))

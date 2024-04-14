@@ -4,6 +4,31 @@
 {% include 'searchbar.html' with context %}
 
 <hr>
+
+{% if issues|length > 0 %}
+<table class="table">
+    <thead>
+        <tr>
+            <th>Order Id</th>
+            <th>Issue Date</th>
+            <th>Return Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for issue in issues %}
+        <tr>
+            <td>{{ issue.order_id }}</td>
+            <td>{{ issue.issue.strftime('%Y-%m-%d') }}</td> 
+            <td>{{ issue.return_date.strftime('%Y-%m-%d') }}</td> 
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endif %}
+
+<hr>
+
 <div class="categories-list">
     {% for section in sections %}
     <div class="section">
@@ -59,12 +84,12 @@
         display: flex;
         flex-wrap: wrap;
         justify-content: flex-start;
-        gap: 10px; 
+        gap: 10px;
     }
 
     .card {
         width: 200px;
-        margin-right: 10px; 
+        margin-right: 10px;
     }
 </style>
 {% endblock %}
