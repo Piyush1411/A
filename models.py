@@ -43,6 +43,7 @@ class Issue(db.Model):
     order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=False)
     issue = db.Column(db.Date, nullable=False)
     return_date = db.Column(db.Date, nullable=False)
+    access = db.Column(db.Boolean, default=False)
     
 class Cart(db.Model):
     id = db.Column(db.Integer, primary_key=True)

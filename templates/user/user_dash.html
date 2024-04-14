@@ -4,7 +4,7 @@
 {% include 'searchbar.html' with context %}
 
 <hr>
-
+<form action="{{url_for('user_dash')}}" method="POST">
 {% if issues|length > 0 %}
 <table class="table">
     <thead>
@@ -12,6 +12,7 @@
             <th>Order Id</th>
             <th>Issue Date</th>
             <th>Return Date</th>
+            <th>Access Status</th>
         </tr>
     </thead>
     <tbody>
@@ -19,14 +20,15 @@
         <tr>
             <td>{{ issue.order_id }}</td>
             <td>{{ issue.issue.strftime('%Y-%m-%d') }}</td> 
-            <td>{{ issue.return_date.strftime('%Y-%m-%d') }}</td> 
+            <td>{{ issue.return_date.strftime('%Y-%m-%d') }}</td>
+            <td>{{ issue.access1 }}</td> 
         </tr>
         {% endfor %}
     </tbody>
 </table>
 
 {% endif %}
-
+</form>
 <hr>
 
 <div class="categories-list">

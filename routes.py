@@ -231,12 +231,12 @@ def add_section_post():
     flash('Section added successfully')
     return redirect(url_for('admin_dash'))
 
-@app.route('/category/<int:id>/')
+@app.route('/section/<int:id>/')
 @admin_required
 def show_section(id):
     section = Section.query.get(id)
     if not section:
-        flash('Sectiondoes not exist')
+        flash('Section does not exist')
         return redirect(url_for('admin_dash'))
     return render_template('section/show.html', section=section)
 
@@ -455,11 +455,10 @@ def user_dash():
     
     if sname:
         sections = Section.query.filter(Section.name.ilike(f'%{sname}%')).all()
-    issues = [] 
-    if not user.is_admin:
-        issues = Issue.query.filter_by(user_id=session['user_id']).all()
     
-    return render_template('user/user_dash.html', sections=sections, sname=sname, bname=bname,price=price, issues=issues)#, parameters=parameters)
+    
+    
+    return render_template('user/user_dash.html', sections=sections, sname=sname, bname=bname,price=price)#, parameters=parameters)
 
 @app.route('/add_to_cart/<int:book_id>', methods = ['POST'])
 @auth_required
@@ -548,6 +547,36 @@ def checkout():
     flash('Order placed successfully')
     return redirect(url_for('payments', id=transaction.id))
 
+@app.route('/issue')
+@auth_required
+def issue():
+    issue_id = request.args.get('id')
+    issue = Issue.query.get(issue_id)
+    return render_template('user/user_dash.html', issue=issue)
+
+@app.route('/issue/access_book/<int:issue_id>', methods=['POST'])
+@auth_required
+def access_book(issue_id):
+    user = User.query.get(session['user_id'])
+    issue = Issue.query.get(issue_id)
+    if issue and issue.user_id == session['user_id']:
+        return_date = issue.issue_date + timedelta(days=7)
+        if user.is_admin:
+            if datetime.now() <= return_date:
+                issue.access = True
+            else:
+                issue.access = False
+        else:
+            if datetime.now() <= return_date:
+                issue.access = "Access Granted"
+            else:
+                issue.access = "Access Denied"
+        db.session.commit()
+        return render_template('user/user_dash.html', issue=issue)
+    else:
+        flash('Invalid issue ID or unauthorized access.')
+        return redirect(url_for('user_dash'))
+
 @app.route('/payments/<int:id>')
 @auth_required
 def payments(id):
@@ -582,3 +611,5 @@ def payments_post(id):
 def orders():
     transactions = Transaction.query.filter_by(user_id=session['user_id']).order_by(Transaction.datetime.desc()).all()
     return render_template('user/orders.html', transactions=transactions)
+
+
