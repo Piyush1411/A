@@ -21,6 +21,7 @@
         <tr>
             <th>Section ID</th>
             <th>Section Name</th>
+            <th>Description</th>
             <th>No of Books</th>
             <th>Actions</th>
         </tr>
@@ -30,6 +31,7 @@
         <tr>
             <td>{{section.id}}</td>
             <td>{{section.name}}</td>
+            <td>{{section.description}}</td>
             <td>{{section.books|length}}</td>
             <td>
                 <a href="{{url_for('show_section', id=section.id)}}" class="btn btn-primary">
@@ -42,7 +44,7 @@
                </a>
                <a href="{{url_for('delete_section', id=section.id)}}" class="btn btn-danger">
                 <i class="fas fa-trash "></i>
-                Delete
+                    Delete
                </a>
             </td>
         </tr>

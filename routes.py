@@ -563,17 +563,19 @@ def access_book(issue_id):
     if issue and issue.user_id == session['user_id']:
         return_date = issue.issue_date + timedelta(days=7)
         if user.is_admin:
-            if datetime.now() <= return_date:
-                access = True
+            if datetime.now() >= issue.issue_date and datetime.now() <= return_date:
+                issue.access = True
             else:
-                access = False
+                issue.access = False
         else:
-            if datetime.now() <= return_date:
-                access1 = "Access Granted"
+            if datetime.now() >= issue.issue_date and datetime.now() <= return_date:
+                issue.access = True
             else:
-                access1 = "Access Denied"
+                issue.access = False
 
-        return render_template('user/user_dash.html', issue=issue, access1=access1)
+        db.session.commit()
+
+        return render_template('user/user_dash.html', issue =issue,)
     else:
         flash('Invalid issue ID or unauthorized access.')
         return redirect(url_for('user_dash'))
