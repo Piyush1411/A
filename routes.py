@@ -551,7 +551,7 @@ def checkout():
 @app.route('/issue')
 @auth_required
 def issue():
-    issue_id = issue_id = request.args.get('id')
+    issue_id = request.args.get('id')
     issue = Issue.query.get(issue_id)
     return render_template('user/user_dash.html', issue=issue)
 
