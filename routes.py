@@ -102,43 +102,6 @@ def admin_required(func):
         return func(*args, **kwargs)
     return inner
 
-@app.route('/profile')
-@auth_required
-def profile():
-    user = User.query.get(session['user_id'])
-    return render_template('user/profile.html', user=user)
-
-@app.route('/profile', methods=['POST'])
-@auth_required
-def profile_post():
-    username = request.form.get('userName')
-    cpassword = request.form.get('cpassword')
-    password = request.form.get('password')
-    name = request.form.get('fullName')
-
-    if not username or not cpassword or not password:
-        flash('Please fill out all the required fields')
-        return redirect(url_for('profile'))
-    
-    user = User.query.get(session['user_id'])
-    if not check_password_hash(user.passhash, cpassword):
-        flash('Incorrect password')
-        return redirect(url_for('profile'))
-    
-    if username != user.username:
-        new_username = User.query.filter_by(username=username).first()
-        if new_username:
-            flash('Username already exists')
-            return redirect(url_for('profile'))
-    
-    new_password_hash = generate_password_hash(password)
-    user.username = username
-    user.passhash = new_password_hash
-    user.name = name
-    db.session.commit()
-    flash('Profile updated successfully')
-    return redirect(url_for('profile'))
-
 @app.route('/logout')
 @auth_required
 def logout():
@@ -176,6 +139,7 @@ def admin_login_post():
 @app.route('/admin_dash')
 @admin_required
 def admin_dash():
+    
     sections = Section.query.all()
     for section in sections:
        print(section.books)
@@ -345,7 +309,7 @@ def add_book_post():
     db.session.add(book)
     db.session.commit()
 
-    flash('Product added successfully')
+    flash('Book added successfully')
     return redirect(url_for('show_section', id=section_id))
 
 @app.route('/book/<int:id>/edit')
@@ -458,8 +422,10 @@ def user_dash():
     issues = [] 
     if not user.is_admin:
         issues = Issue.query.filter_by(user_id=session['user_id']).all()
+
+    payments = Payment.query.all()
     
-    return render_template('user/user_dash.html', sections=sections, sname=sname, bname=bname,price=price, issues=issues)#, parameters=parameters)
+    return render_template('user/user_dash.html', user=user, sections=sections, sname=sname, bname=bname,price=price, issues=issues, payments=payments)#, parameters=parameters)
 
 @app.route('/add_to_cart/<int:book_id>', methods = ['POST'])
 @auth_required
@@ -569,18 +535,19 @@ def payments(id):
 
     return render_template('payments.html', payment=payment, total=total, GST=GST, amount_payable=amount_payable)
 
-@app.route('/payments/<int:id>', methods=['POST'])
+@app.route('/payments', methods=['POST'])
 @auth_required
-def payments_post(id):
-    payment = Payment.query.get(id)
+def payments_post():
+    user = User.query.get(session['user_id'])
+    payment = Payment.query.get()
     if not payment:
         flash('Payment not found')
         return redirect(url_for('cart'))
 
     flash('Payment successful')
-    print('Before redirection to user_dash')
-    return redirect(url_for('user_dash'))
-    print('After redirection to user_dash')
+    print(url_for('user_dash'))
+    return redirect(url_for('user_dash', user=user))
+    
 
 @app.route('/orders')
 @auth_required

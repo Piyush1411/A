@@ -2,6 +2,10 @@
 
 {% block content %}
     {% include 'searchbar.html' with context %}
+        <div class="profile-pic">
+            <img src="https://api.dicebear.com/6.x/lorelei/svg?seed={{user.username}}"  width=100 alt="">
+        </div>
+    
     <hr>
     <form action="{{url_for('user_dash')}}" method="POST">
         {% if issues|length > 0 %}
@@ -28,7 +32,7 @@
         {% endif %}
     </form>
     <hr>
-
+    <div class="categories-list">
     {% for section in sections %}
         <div class="section">
             <div class="col-md-6 text-white">

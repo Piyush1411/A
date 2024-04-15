@@ -6,7 +6,7 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
+            <ul class="navbar-nav me-auto">
                 {% if 'user_id' in session %}
                     {% if user and user.is_admin %}
                         <li class="nav-item">
@@ -15,9 +15,6 @@
                     {% else %}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('user_dash') }}">Dashboard</a>
-                        </li>
-                        <li class="nav-item">
-                          <a class="nav-link" href="{{ url_for('profile') }}">Profile</a>
                         </li>
                         {% if request.endpoint != 'admin_dash' %}
                             <li class="nav-item">
@@ -37,7 +34,13 @@
                     </li>
                 {% endif %}
             </ul>
+            <ul class="navbar-nav">
+                {% if 'user_id' in session %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                    </li>
+                {% endif %}
+            </ul>
         </div>
     </div>
-  </nav>
-  
+</nav>
