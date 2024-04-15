@@ -1,97 +1,88 @@
 {% extends 'base.html' %}
 
 {% block content %}
-{% include 'searchbar.html' with context %}
+    {% include 'searchbar.html' with context %}
+    <hr>
+    <form action="{{url_for('user_dash')}}" method="POST">
+        {% if issues|length > 0 %}
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Order Id</th>
+                        <th>Issue Date</th>
+                        <th>Return Date</th>
+                        <th>Access Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for issue in issues %}
+                        <tr>
+                            <td>{{ issue.order_id }}</td>
+                            <td>{{ issue.issue.strftime('%Y-%m-%d') }}</td> 
+                            <td>{{ issue.return_date.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ issue.access }}</td> 
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </form>
+    <hr>
 
-<hr>
-<form action="{{url_for('user_dash')}}" method="POST">
-{% if issues|length > 0 %}
-<table class="table">
-    <thead>
-        <tr>
-            <th>Order Id</th>
-            <th>Issue Date</th>
-            <th>Return Date</th>
-            <th>Access Status</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for issue in issues %}
-        <tr>
-            <td>{{ issue.order_id }}</td>
-            <td>{{ issue.issue.strftime('%Y-%m-%d') }}</td> 
-            <td>{{ issue.return_date.strftime('%Y-%m-%d') }}</td>
-            <td>{{ issue.access }}</td> 
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-{% endif %}
-</form>
-<hr>
-
-<div class="categories-list">
     {% for section in sections %}
-    <div class="section">
-        <h2>{{ section.name }}</h2>
-        <div class="books">
-            {% for book in section.books %}
-            <div class="card" style="width: 18rem;">
-                <img src="https://picsum.photos/200/200" class="card-img-top" alt="{{ book.name }}">
-                <div class="card-body">
-                    <h5 class="card-title">{{ book.name }}</h5>
-                    <p class="card-text">
-                        <div class="price">
-                            <strong>Price:</strong>
-                            &#8377;{{ book.price }}
-                        </div>
-                    </p>
-                    {% if book.name != '' %}
-                    <div class="quantity_input">
-                        <form action="{{ url_for('add_to_cart', book_id=book.id) }}" method="POST" class="form">
-                            <label for="quantity">PDF Quantity Download:</label>
-                            <input class="form" type="number" name="quantity" id="quantity" value="5">
-                            <input type="submit" value="Add to Cart" class="btn btn-success">
-                        </form>
-                    </div>
-                    {% else %}
-                    <button disabled="disabled" class="btn btn-outline-danger">
-                        <i class="fas fa-times"></i>
-                        No Download
-                    </button>
-                    {% endif %}
-                </div>
+        <div class="section">
+            <div class="col-md-6 text-white">
+            <h2>{{ section.name }}</h2>
             </div>
-            {% endfor %}
+            <div class="books">
+                {% for book in section.books %}
+                    <div class="card" style="width: 18rem;">
+                        <img src="https://picsum.photos/200/200" class="card-img-top" alt="{{ book.name }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ book.name }}</h5>
+                            <h5 class="card-title">{{ book.content }}</h5>
+                            <p class="card-text">
+                                <div class="price">
+                                    <strong>Price:</strong>
+                                    &#8377;{{ book.price }}
+                                </div>
+                                <div class="quantity">
+                                    <strong>Downloadable:</strong>
+                                    {% if book.downloadable %}
+                                        Yes
+                                    {% else %}
+                                        No
+                                    {% endif %}
+                                </div>
+                            </p>
+                            <div class="quantity_input">
+                                <form action="{{ url_for('add_to_cart', book_id=book.id) }}" method="POST" class="form">
+                                    <label for="quantity">Quantity:</label>
+                                    <input class="form" type="number" name="quantity" id="quantity" min="1"
+                                        max="{{ book.quantity }}" value="1">
+                                    <input type="submit" value="Add to Cart" class="btn btn-success">
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
-    </div>
     {% endfor %}
-</div>
 {% endblock %}
 
 {% block style %}
 <style>
-    .categories-list {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
     .section {
         margin-bottom: 20px;
     }
-
     .books {
         display: flex;
         flex-wrap: wrap;
-        justify-content: flex-start;
-        gap: 10px;
+        justify-content: center;
     }
-
     .card {
-        width: 200px;
-        margin-right: 10px;
+        margin: 10px;
     }
 </style>
 {% endblock %}
